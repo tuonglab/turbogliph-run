@@ -14,7 +14,7 @@ setwd(args[1])
 
 output_dir <- args[2]
 
-files <- list.files(pattern = "airr_extracted\\.tsv", recursive = TRUE)
+files <- list.files(pattern = "extracted\\.tsv", recursive = TRUE)
 
 # Define a function to read a single file
 read_file <- function(file) {
@@ -59,6 +59,13 @@ process_data_frame <- function(data, output_dir) {
 
     output_dir <- file.path(output_dir, file_name)
 
+    # Check if the output directory already exists and contains files
+    if (dir.exists(output_dir) && length(list.files(output_dir)) > 0) {
+        print(paste("Skipping file", file_name, "as its output directory already exists and contains files"))
+        return(NULL)
+    }
+
+
     # Check if the number of rows in the data frame is less than 2
     if (nrow(df) < 2) {
         print(paste("Skipping gliph2 for file", file_name, "as it has less than 2 rows"))
@@ -68,7 +75,7 @@ process_data_frame <- function(data, output_dir) {
     tryCatch(
         {
             # Try running gliph2 with the original parameters
-            gliph2(df, n_cores = NULL, global_vgene = TRUE, result_folder = output_dir, motif_length = c(2,3, 4), min_seq_length = 8, local_similarities = FALSE)
+            gliph2(df, n_cores = NULL, global_vgene = TRUE, local_similarities = FALSE, result_folder = output_dir, motif_length = c(2,3, 4), min_seq_length = 8)
         },
         error = function(e) {
             # If an error occurs, print the error message
@@ -77,19 +84,19 @@ process_data_frame <- function(data, output_dir) {
             # Save the error message to a log file
             write(paste("Caught an error with file", file_name, ":", e$message), file = "error_log.txt", append = TRUE)
 
-            # Then try running gliph2 with the alternative parameters
-            tryCatch(
-                {
-                    gliph2(df, n_cores = NULL, global_vgene = TRUE, result_folder = output_dir, motif_length = c(2,3, 4), min_seq_length = 8, local_similarities = FALSE) # Change the parameters as needed
-                },
-                error = function(e) {
-                    # If an error occurs, print the error message
-                    print(paste("Caught an error with file", file_name, "on the second attempt:", e$message))
+            # # Then try running gliph2 with the alternative parameters
+            # tryCatch(
+            #     {
+            #         gliph2(df, n_cores = NULL, global_vgene = TRUE, result_folder = output_dir, motif_length = c(2,3, 4), min_seq_length = 8, local_similarities = FALSE) # Change the parameters as needed
+            #     },
+            #     error = function(e) {
+            #         # If an error occurs, print the error message
+            #         print(paste("Caught an error with file", file_name, "on the second attempt:", e$message))
 
-                    # Save the error message to a log file
-                    write(paste("Caught an error with file", file_name, "on the second attempt:", e$message), file = "error_log.txt", append = TRUE)
-                }
-            )
+            #         # Save the error message to a log file
+            #         write(paste("Caught an error with file", file_name, "on the second attempt:", e$message), file = "error_log.txt", append = TRUE)
+            #     }
+            # )
         }
     )
 }
