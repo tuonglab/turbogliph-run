@@ -68,7 +68,7 @@ process_data_frame <- function(data, output_dir) {
     tryCatch(
         {
             # Try running gliph2 with the original parameters
-            gliph2(df, n_cores = NULL, global_vgene = TRUE, result_folder = output_dir, motif_length = c(2,3, 4), min_seq_length = 8, local_similarities = FALSE)
+            gliph2(df, n_cores = NULL, global_vgene = TRUE, result_folder = output_dir, motif_length = c(2,3, 4), min_seq_length = 8, local_similarities = TRUE, lcminp = 0.05, ref_cluster_size = "simulated", kmer_mindepth =2)
         },
         error = function(e) {
             # If an error occurs, print the error message

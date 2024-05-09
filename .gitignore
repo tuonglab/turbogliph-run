@@ -35,3 +35,5 @@ run_t1d.output
 run_was.error
 run_was.output
 change_name.sh
+run_new.error
+run_new.output
